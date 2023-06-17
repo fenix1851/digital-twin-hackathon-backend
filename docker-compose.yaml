@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgis/postgis
+    restart: always
+    networks:
+      - container_net
+    ports:
+      - "5432:5432"
+    command: postgres -c 'max_connections=250' -c 'shared_buffers=256MB'
+    env_file:
+      - .env
+    volumes:
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    container_name: db
+  server:
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - container_net
+    build: .
+    depends_on:
+      - db
+      - mongo  # Добавлен сервис MongoDB
+    volumes:
+      - .:/app
+  nginx:
+    restart: always
+    build: ./nginx
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "4000:80"
+  mongo:  # Добавлен сервис MongoDB
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - container_net
+
+networks:
+  container_net:
+    external: true
+    name: container_net
