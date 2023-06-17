@@ -13,6 +13,10 @@ import urllib3
 import random
 import json
 from geoalchemy2 import functions
+from geoalchemy2.elements import WKBElement
+from geoalchemy2.shape import to_shape
+from shapely.geometry import Point, LineString
+import random
 
 # Подавление предупреждений urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -129,7 +133,13 @@ class RoadRepository:
             for i in range(count):
                 road = random.choice(roads)
                 print(f'Object {object_type} {i} is generating')
-                coordinates = f"{road.geometry.y};{road.geometry.x}"  # Concatenate latitude and longitude
+
+                # Преобразуем геометрию в объект Shapely
+                road_shape = to_shape(road.geometry)
+
+                # Берем случайную точку на дороге
+                random_point_on_road = road_shape.interpolate(random.random(), normalized=True)
+                
                 object_type_db = self.db.query(ObjectType).filter(ObjectType.name == object_type).first()
                 if object_type_db:
                     object = Object(
@@ -137,9 +147,9 @@ class RoadRepository:
                         commercial_points=random.randint(0, 10),
                         social_points=random.randint(0, 10),
                         type_id=object_type_db.id,
-                        geometry=road.geometry,  # Use the original geometry (WKBElement)
+                        geometry=f'POINT({random_point_on_road.x} {random_point_on_road.y})',
                         attributes={},
-                        coordinates=coordinates,
+                        coordinates=(random_point_on_road.x, random_point_on_road.y),  # Теперь здесь случайная точка на дороге
                         weekly_visitors=random.randint(100, 1000)
                     )
                     objects.append(object)
