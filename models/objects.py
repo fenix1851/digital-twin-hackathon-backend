@@ -33,5 +33,18 @@ class Object(Base):
     weekly_visitors = Column(Integer) 
     object_type = relationship("ObjectType", back_populates="objects")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'commercial_points': self.commercial_points,
+            'social_points': self.social_points,
+            'type_id': self.type_id,
+            # 'geometry': str(self.geometry),
+            'attributes': self.attributes,
+            'coordinates': self.coordinates,
+            'weekly_visitors': self.weekly_visitors
+        }
+
 
 
