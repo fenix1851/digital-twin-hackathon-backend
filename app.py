@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers import road, analyse
 from database import get_db
 
@@ -6,13 +7,19 @@ from database import get_db
 app = FastAPI()
 app.include_router(road.router)
 app.include_router(analyse.router)
-# Подключение к базе данных
 
+# Добавление CORS-мидлвары
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Разрешаем все источники
+    allow_methods=["*"],  # Разрешаем все HTTP-методы
+    allow_headers=["*"],  # Разрешаем все заголовки
+)
+
+# Подключение к базе данных
 
 # Пример маршрута
 @app.get("/")
 def read_root():
     # переадресация на маршрут /docs
-    return '/docs'
-    
-
+    return {'message': 'Redirecting to /docs'}

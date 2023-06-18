@@ -1,12 +1,14 @@
-from geopy.geocoders import Nominatim
+from geopy.geocoders import GoogleV3
 import random
 
-def get_coordinates(address: str) -> tuple:
-    geolocator = Nominatim(user_agent="my-app")  # Создание экземпляра геокодера
-    
+API_KEY = 'AIzaSyA2L7YXJknDDK-Z-LfuNeUvxaje-YFPdn0'  # Замените на свой ключ API от Google
+
+def get_coordinates(address: str) -> dict:
+    geolocator = GoogleV3(api_key=API_KEY)  # Создание экземпляра геокодера GoogleV3
+
     # Сначала попытка геокодировать полный адрес
-    location = geolocator.geocode(address)  
-    
+    location = geolocator.geocode(address)
+
     # Если геокодирование не удалось, убрать детали адреса и попробовать снова
     if location is None:
         address.replace('пгт', 'п')
@@ -41,3 +43,4 @@ def get_coordinates(address: str) -> tuple:
         "is_fake": False,
     }
 
+print(get_coordinates('Краснодарский край, городской округ Сочи, город Сочи, улица Конституции СССР, 1'))
